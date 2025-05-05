@@ -42,3 +42,113 @@ The source `classicmodels` database schema is based on the standard MySQL sample
 * **dbt Packages:** `dbt-utils`, `dbt-date`
 
 ## dbt Project Structure
+classicmodels_modeling/
+├── dbt_project.yml     # Main dbt project configuration
+├── models/             # Contains SQL models
+│   ├── obt/            # Models for One Big Table
+│   │   ├── orders_obt.sql
+│   │   └── schema.yml
+│   └── star_schema/    # Models for Star Schema
+│       ├── dim_customers.sql
+│       ├── dim_dates.sql
+│       ├── dim_employees.sql
+│       ├── dim_offices.sql
+│       ├── dim_products.sql
+│       ├── fact_orders.sql
+│       ├── dates.sql      # Helper model for date dimension
+│       └── schema.yml
+├── packages.yml        # Declares dbt package dependencies
+└── profiles.yml        # (Typically in ~/.dbt/, contains connection profiles - included in scripts/ for lab)
+
+
+## Models Implemented
+
+### 1. Star Schema (`classicmodels_star_schema`)
+
+A classic dimensional model optimized for BI and reporting:
+
+* **Fact Table:** `fact_orders` (granularity: order line item)
+* **Dimension Tables:**
+    * `dim_customers`
+    * `dim_employees`
+    * `dim_offices`
+    * `dim_products` (joins `products` and `productlines`)
+    * `dim_dates` (generated using `dbt_date`)
+* **Features:** Uses surrogate keys generated via `dbt_utils.generate_surrogate_key`.
+
+### 2. One Big Table (OBT) (`classicmodels_obt`)
+
+A denormalized table joining relevant information for potentially simpler querying:
+
+* **Table:** `orders_obt`
+* **Features:** Contains dimension attributes directly within the table, created via multiple joins from the source tables.
+
+## Data Quality & Testing
+
+Data tests were defined in the `schema.yml` files for both the Star Schema and OBT models to ensure data integrity. Tests included:
+
+* `unique`: Ensure primary key uniqueness.
+* `not_null`: Ensure key columns are populated.
+* `dbt_utils.unique_combination_of_columns`: Ensure composite primary keys are unique (used for `orders_obt`).
+
+Tests are executed using the `dbt test` command.
+
+## Setup & Usage
+
+To run this dbt project:
+
+1.  **Prerequisites:**
+    * dbt Core installed (`pip install dbt-postgres`).
+    * Access to a PostgreSQL database (e.g., on AWS RDS).
+    * The `classicmodels` sample dataset loaded into a schema named `classicmodels` within the target database.
+2.  **Configuration:**
+    * Clone this repository.
+    * Configure your dbt profile (`~/.dbt/profiles.yml` or using environment variables) with the connection details for your PostgreSQL database. A sample `profiles.yml` structure (as used in the source lab) is provided in `scripts/profiles.yml` - **ensure you replace placeholders with your actual credentials and endpoint**.
+3.  **Install Dependencies:**
+    ```bash
+    cd classicmodels_modeling
+    dbt deps
+    ```
+4.  **Run Models:**
+    * To run only the Star Schema models:
+        ```bash
+        dbt run --select star_schema
+        # Or use shorthand: dbt run -s star_schema
+        ```
+    * To run only the OBT models:
+        ```bash
+        dbt run --select obt
+        # Or use shorthand: dbt run -s obt
+        ```
+    * To run all models:
+        ```bash
+        dbt run
+        ```
+5.  **Run Tests:**
+    * To run tests on Star Schema models:
+        ```bash
+        dbt test --select star_schema
+        # Or use shorthand: dbt test -s star_schema
+        ```
+    * To run tests on OBT models:
+        ```bash
+        dbt test --select obt
+        # Or use shorthand: dbt test -s obt
+        ```
+    * To run all tests:
+        ```bash
+        dbt test
+        ```
+
+## Discussion: Star Schema vs. OBT Trade-offs
+
+This project allowed for a practical comparison of these modeling approaches:
+
+* **Star Schema:** Generally provides a more normalized, maintainable structure, often requiring less storage. It's conceptually clear for BI tools and analysts familiar with dimensional modeling. Queries typically involve joins between fact and dimension tables.
+* **One Big Table (OBT):** Denormalization can simplify certain analytical queries by pre-joining data, potentially leading to faster query performance for specific use cases as fewer joins are needed at query time. However, OBTs can become very wide, potentially require more storage space, and updates can be more complex as data is duplicated.
+
+The choice between them depends heavily on specific query patterns, downstream tooling, data volume, update frequency, and team familiarity.
+
+## Conclusion
+
+This project successfully demonstrates the use of dbt Core to implement, test, and manage data trans
