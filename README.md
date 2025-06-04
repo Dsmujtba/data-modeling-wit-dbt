@@ -1,4 +1,4 @@
-# Project: Data Modeling for Analytics using dbt on AWS RDS (Star Schema & OBT)
+# Data Modeling for Analytics using dbt on AWS RDS (Star Schema & OBT)
 
 ## Project Overview
 
