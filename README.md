@@ -59,6 +59,6 @@ Ensuring data reliability was paramount. I leveraged dbt's testing framework ext
 * **Cloud Platform:** Amazon Web Services (AWS)
 * **dbt Packages:** `dbt-utils`, `dbt-date`
 * **Version Control:** Git & GitHub
-* **Development Environment:** Standard Command Line (for dbt execution), (Optionally mention: VS Code with dbt extensions, Jupyter Notebook for exploration/lab guidance)
+* **Development Environment:** Standard Command Line (for dbt execution)
 
 ---
