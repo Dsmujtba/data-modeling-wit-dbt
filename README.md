@@ -1,4 +1,4 @@
-# Advanced Data Modeling for Analytics with dbt & PostgreSQL on AWS RDS
+# Data Modeling for Analytics with dbt & PostgreSQL on AWS RDS
 
 This project showcases my ability to design, implement, and rigorously test sophisticated analytical data models using dbt (Data Build Tool) Core. I engineered a solution to transform the `classicmodels` relational dataset, hosted on PostgreSQL in AWS RDS, into two distinct, analytics-ready structures: a best-practice Star Schema and a denormalized One Big Table (OBT). My goal was to master dbt's powerful transformation capabilities and apply data modeling principles in a cloud environment.
 
